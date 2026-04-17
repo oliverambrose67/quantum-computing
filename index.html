@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Computing: The Next Frontier</title>
+    <title>Quantum Computing Interactive</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Jura:wght@500;700&family=Montserrat:wght@400;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Roboto+Flex:opsz,wght@8..144,400;8..144,700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            dark: '#0B1120', // Deep dark blue
-                            blue: '#1e3a8a', // Dark blue
-                            gold: '#fbbf24', // Gold/Amber
-                            lightgold: '#fde68a'
+                            dark: '#0f172a', // Slate 900
+                            card: '#1e293b', // Slate 800
+                            red: '#ef4444', // Red 500
+                            reddark: '#b91c1c', // Red 700
+                            babyblue: '#7dd3fc', // Sky 300
+                            blueglow: '#bae6fd' // Sky 200
                         }
                     }
                 }
@@ -23,341 +26,899 @@
         }
     </script>
     <style>
+        /* Base Theme (Default) */
         body {
-            background-color: #0B1120;
+            background-color: #0f172a;
             color: #f8fafc;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+            transition: background-color 0.4s, color 0.4s;
         }
         .glass-card {
-            background: rgba(30, 58, 138, 0.2);
+            background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(125, 211, 252, 0.2);
+            transition: all 0.3s ease;
         }
-        /* Custom Audio Player Styling */
-        audio {
-            width: 100%;
-            height: 48px;
-            border-radius: 9999px;
-            outline: none;
+        .glass-card:hover {
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.1);
         }
-        audio::-webkit-media-controls-panel {
-            background-color: #fbbf24; /* Gold */
-            color: #0B1120;
+
+        /* --- Custom Themes --- */
+
+        /* 1. Laboratory Theme */
+        body.theme-laboratory { background-color: #f1f5f9; color: #0f172a; font-family: 'Roboto Flex', sans-serif; }
+        body.theme-laboratory .glass-card { background: #ffffff; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        body.theme-laboratory .text-white { color: #0f172a !important; }
+        body.theme-laboratory .text-slate-300 { color: #334155 !important; } /* Darker for better contrast */
+        body.theme-laboratory .text-slate-400 { color: #475569 !important; }
+        body.theme-laboratory .text-brand-babyblue { color: #082f49 !important; } /* Much darker navy for readability */
+        body.theme-laboratory .bg-brand-card { background-color: #e2e8f0 !important; }
+        body.theme-laboratory .bg-slate-900 { background-color: #f8fafc !important; }
+        body.theme-laboratory #hero-bg { opacity: 0; visibility: hidden; } /* Properly hides dark hero bg */
+        body.theme-laboratory .bg-gradient-to-r { background-image: linear-gradient(to right, #b91c1c, #082f49) !important; }
+        body.theme-laboratory .glow-text { text-shadow: none !important; font-weight: 800; }
+
+        /* Fix Theme Menu Dropdown Text (Always White on Navy) */
+        #theme-menu button { color: #ffffff !important; }
+        #theme-menu button:hover { background-color: #1e293b !important; }
+
+        /* 2. Cyberpunk Theme */
+        body.theme-cyberpunk { background-color: #050505; font-family: 'Share Tech Mono', Courier, monospace; text-transform: uppercase; letter-spacing: 0.05em; }
+        body.theme-cyberpunk .glass-card { background: #0a0a0a; border: 2px solid #7dd3fc; border-radius: 0; box-shadow: 0 0 10px rgba(125,211,252,0.2) inset; }
+        body.theme-cyberpunk .glass-card:hover { border-color: #ef4444; box-shadow: 0 0 15px rgba(239,68,68,0.4) inset; }
+        body.theme-cyberpunk button, body.theme-cyberpunk .rounded-xl, body.theme-cyberpunk .rounded-2xl { border-radius: 0 !important; }
+
+        /* 3. Terminal Theme */
+        body.theme-terminal { background-color: #000000; color: #7dd3fc; font-family: 'Fira Code', 'Consolas', monospace; }
+        body.theme-terminal .glass-card { background: #000; border: 1px dashed #7dd3fc; border-radius: 0; box-shadow: none; }
+        body.theme-terminal .glass-card:hover { border: 1px dashed #ef4444; }
+        body.theme-terminal .text-white, body.theme-terminal .text-slate-300 { color: #bae6fd !important; }
+        body.theme-terminal button, body.theme-terminal .rounded-xl, body.theme-terminal .rounded-2xl { border-radius: 0 !important; }
+
+        /* 4. Blueprint Theme */
+        body.theme-blueprint { 
+            background-color: #0c4a6e; 
+            background-image: linear-gradient(rgba(125, 211, 252, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(125, 211, 252, 0.2) 1px, transparent 1px);
+            background-size: 30px 30px;
+            font-family: 'Jura', sans-serif;
         }
-        audio::-webkit-media-controls-play-button,
-        audio::-webkit-media-controls-mute-button {
-            filter: brightness(0); /* Make icons dark */
+        body.theme-blueprint .glass-card { background: rgba(12, 74, 110, 0.8); border: 2px solid #7dd3fc; border-radius: 0; }
+        body.theme-blueprint button, body.theme-blueprint .rounded-xl, body.theme-blueprint .rounded-2xl { border-radius: 0 !important; }
+
+        /* 5. Noir Theme */
+        body.theme-noir { background-color: #0a0a0a; color: #d1d5db; font-family: 'Playfair Display', serif; }
+        body.theme-noir .glass-card { background: #171717; border: 1px solid #333; border-radius: 0; box-shadow: 8px 8px 0px rgba(239, 68, 68, 0.5); }
+        body.theme-noir .glass-card:hover { box-shadow: 8px 8px 0px rgba(125, 211, 252, 0.5); transform: translate(-2px, -2px); }
+        body.theme-noir button, body.theme-noir .rounded-xl, body.theme-noir .rounded-2xl { border-radius: 0 !important; }
+        
+        /* General Interactive Animations */
+        .tab-content { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        audio::-webkit-media-controls-current-time-display,
-        audio::-webkit-media-controls-time-remaining-display {
-            color: #0B1120;
-            font-weight: bold;
-        }
+        #quantum-coin { transition: transform 0.1s, background 0.1s; box-shadow: 0 0 20px rgba(125, 211, 252, 0.5); }
+        .search-box { transition: background-color 0.2s; }
+        .glow-text { text-shadow: 0 0 10px rgba(125, 211, 252, 0.5); }
+        .particle { transition: all 0.2s; }
     </style>
 </head>
-<body class="antialiased selection:bg-brand-gold selection:text-brand-dark">
+<body class="antialiased selection:bg-brand-babyblue selection:text-brand-dark min-h-screen flex flex-col theme-default">
 
-    <!-- Navigation -->
-    <nav class="fixed w-full z-50 glass-card border-b-0 border-t-0 border-l-0 border-r-0 border-brand-gold/30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-atom text-brand-gold text-2xl"></i>
-                    <span class="font-bold text-xl text-white tracking-wider">QUANTUM<span class="text-brand-gold">AL</span></span>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-6 text-sm font-medium">
-                        <a href="#concepts" class="hover:text-brand-gold transition">Concepts</a>
-                        <a href="#comparison" class="hover:text-brand-gold transition">Comparison</a>
-                        <a href="#algorithms" class="hover:text-brand-gold transition">Algorithms</a>
-                        <a href="#applications" class="hover:text-brand-gold transition">Applications</a>
-                        <a href="#alabama" class="hover:text-brand-gold transition">Alabama Hub</a>
-                        <a href="#careers" class="hover:text-brand-gold transition">Careers</a>
-                        <a href="#debate" class="hover:text-brand-gold transition">The Debate</a>
+    <!-- App Header & Hero -->
+    <header class="pt-12 pb-6 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
+        <div id="hero-bg" class="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-brand-card via-brand-dark to-brand-dark -z-10 transition-colors duration-500"></div>
+        
+        <!-- Theme Switcher -->
+        <div class="absolute top-4 right-4 md:right-8 z-50">
+            <div class="relative inline-block text-left">
+                <button onclick="toggleThemeMenu()" class="inline-flex justify-center items-center rounded-lg border border-slate-600 px-4 py-2 bg-brand-dark/80 text-sm font-bold text-white hover:bg-slate-700 transition shadow-lg backdrop-blur-md">
+                    <i class="fa-solid fa-palette mr-2 text-brand-red"></i> Theme: <span id="current-theme-name" class="ml-2 text-brand-babyblue uppercase tracking-wider">Default</span>
+                    <i class="fa-solid fa-chevron-down ml-2 text-xs text-slate-400"></i>
+                </button>
+                <div id="theme-menu" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-2xl bg-brand-dark border border-brand-babyblue/30 ring-1 ring-black ring-opacity-5 hidden z-50 overflow-hidden">
+                    <div class="py-1" role="menu">
+                        <button onclick="setTheme('default', 'Default')" class="block px-4 py-3 text-sm text-white hover:bg-slate-700 w-full text-left font-semibold border-b border-slate-700">Default</button>
+                        <button onclick="setTheme('laboratory', 'Laboratory')" class="block px-4 py-3 text-sm text-white hover:bg-slate-700 w-full text-left font-semibold border-b border-slate-700">Laboratory</button>
+                        <button onclick="setTheme('cyberpunk', 'Cyberpunk')" class="block px-4 py-3 text-sm text-white hover:bg-slate-700 w-full text-left font-semibold border-b border-slate-700">Cyberpunk</button>
+                        <button onclick="setTheme('terminal', 'Terminal')" class="block px-4 py-3 text-sm text-white hover:bg-slate-700 w-full text-left font-semibold border-b border-slate-700">Terminal</button>
+                        <button onclick="setTheme('blueprint', 'Blueprint')" class="block px-4 py-3 text-sm text-white hover:bg-slate-700 w-full text-left font-semibold border-b border-slate-700">Blueprint</button>
+                        <button onclick="setTheme('noir', 'Noir')" class="block px-4 py-3 text-sm text-white hover:bg-slate-700 w-full text-left font-semibold">Noir</button>
                     </div>
                 </div>
             </div>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden">
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand-blue/40 via-brand-dark to-brand-dark -z-10"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
-                The Next Era of <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-yellow-200">Computational Power</span>
+        
+        <div class="flex justify-center items-center gap-3 mb-4 mt-6">
+            <i class="fa-solid fa-atom text-brand-babyblue text-4xl animate-spin-slow"></i>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-brand-babyblue">
+                QUANTUM EXPLORER
             </h1>
-            <p class="mt-4 max-w-2xl text-lg md:text-xl text-slate-300 mx-auto mb-10">
-                Exploring the shift from classical bits to quantum qubits, the algorithms changing cybersecurity, and the booming research hub in Huntsville, Alabama.
-            </p>
-            
-            <!-- Podcast Player Component -->
-            <div class="max-w-3xl mx-auto glass-card p-6 rounded-2xl shadow-2xl border-brand-gold/40">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 rounded-full bg-brand-gold flex items-center justify-center">
-                        <i class="fa-solid fa-headphones text-brand-dark text-xl"></i>
-                    </div>
-                    <div class="text-left">
-                        <h3 class="text-white font-bold text-lg">NotebookLM Deep Dive</h3>
-                        <p class="text-sm text-brand-lightgold">Listen to our AI hosts discuss the quantum revolution</p>
-                    </div>
+        </div>
+        
+        <p class="mt-2 max-w-2xl text-lg text-slate-300 mx-auto mb-8">
+            Step into the next era of computing. Explore the algorithms, interactive simulations, and the massive research hub right here in Alabama.
+        </p>
+
+        <!-- Podcast Player Component -->
+        <div class="max-w-2xl mx-auto glass-card p-4 rounded-2xl border-brand-babyblue/40 mb-10 flex flex-col md:flex-row items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-brand-red flex-shrink-0 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                <i class="fa-solid fa-headphones text-white text-xl"></i>
+            </div>
+            <div class="w-full text-left flex-grow">
+                <h3 class="text-brand-babyblue font-bold text-md mb-2">Listen: NotebookLM Deep Dive</h3>
+                <div class="w-full h-16 rounded-xl overflow-hidden border border-brand-red/30 bg-black/30">
+                    <iframe src="https://drive.google.com/file/d/1Hh_cwgS_o2DdppKzTz5AzlEaKd6wZrK8/preview" width="100%" height="100%" allow="autoplay" frameborder="0"></iframe>
                 </div>
-                <!-- 
-                  INSTRUCTIONS FOR GITHUB: 
-                  Replace the 'src' below with your Google Drive Link. 
-                  Make sure to format your Google Drive link like this:
-                  https://drive.google.com/uc?export=download&id=YOUR_FILE_ID 
-                -->
-                <audio controls preload="metadata">
-                <source src="Podcast.m4a" type="audio/mp4">
-                Your browser does not support the audio element.
-                </audio>
             </div>
         </div>
-    </section>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
+        <!-- Interactive Tab Navigation -->
+        <div class="max-w-5xl mx-auto flex flex-wrap justify-center gap-2 p-2 bg-brand-card/50 rounded-2xl border border-slate-700 backdrop-blur-md">
+            <button onclick="openTab('tab-simulations', this)" class="tab-btn active-tab bg-brand-red text-white px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg">
+                <i class="fa-solid fa-gamepad"></i> Demos
+            </button>
+            <button onclick="openTab('tab-concepts', this)" class="tab-btn bg-transparent text-brand-babyblue hover:bg-slate-700 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <i class="fa-solid fa-brain"></i> Concepts
+            </button>
+            <button onclick="openTab('tab-compare', this)" class="tab-btn bg-transparent text-brand-babyblue hover:bg-slate-700 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <i class="fa-solid fa-scale-balanced"></i> Compare
+            </button>
+            <button onclick="openTab('tab-applications', this)" class="tab-btn bg-transparent text-brand-babyblue hover:bg-slate-700 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <i class="fa-solid fa-globe"></i> Real-World
+            </button>
+            <button onclick="openTab('tab-alabama', this)" class="tab-btn bg-transparent text-brand-babyblue hover:bg-slate-700 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <i class="fa-solid fa-rocket"></i> Alabama
+            </button>
+            <button onclick="openTab('tab-pictures', this)" class="tab-btn bg-transparent text-brand-babyblue hover:bg-slate-700 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <i class="fa-solid fa-image"></i> Pictures
+            </button>
+            <button onclick="openTab('tab-videos', this)" class="tab-btn bg-transparent text-brand-babyblue hover:bg-slate-700 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <i class="fa-brands fa-youtube"></i> Videos
+            </button>
+        </div>
+    </header>
 
-        <!-- Concepts Section -->
-        <section id="concepts" class="scroll-mt-24">
-            <div class="flex items-center gap-3 mb-8">
-                <i class="fa-solid fa-cube text-brand-gold text-2xl"></i>
-                <h2 class="text-3xl font-bold">Key Concepts: Demystifying Superposition</h2>
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- ==================== TAB: SIMULATIONS (GAMES) ==================== -->
+        <section id="tab-simulations" class="tab-content block">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white mb-2">Interactive Demonstrations</h2>
+                <p class="text-brand-babyblue">Play with the mechanics that make quantum computers so powerful.</p>
             </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <!-- Game 1: Superposition Coin -->
+                <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
+                    <h3 class="text-2xl font-bold text-brand-red mb-2">1. The Superposition Coin</h3>
+                    <p class="text-sm text-slate-300 mb-6">A normal bit is 0 or 1. A qubit is a spinning coin—a "blur" of both states until you measure it.</p>
+                    
+                    <div id="quantum-coin" class="w-32 h-32 rounded-full bg-gradient-to-tr from-brand-babyblue to-brand-red flex items-center justify-center text-5xl font-black text-white mb-6 border-4 border-slate-800">
+                        ?
+                    </div>
+                    
+                    <p id="coin-status" class="text-brand-babyblue font-bold h-6 mb-6">Waiting to enter superposition...</p>
+                    
+                    <div class="flex gap-4">
+                        <button onclick="startSuperposition()" class="bg-brand-card hover:bg-slate-700 border border-brand-babyblue text-white px-4 py-2 rounded-lg transition font-bold shadow-md">
+                            <i class="fa-solid fa-rotate mr-2"></i> Spin
+                        </button>
+                        <button onclick="measureCoin()" class="bg-brand-red hover:bg-brand-reddark text-white px-4 py-2 rounded-lg transition font-bold shadow-[0_0_10px_rgba(239,68,68,0.6)]">
+                            <i class="fa-solid fa-eye mr-2"></i> Measure It!
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Game 2: The Search Race -->
+                <div class="glass-card p-8 rounded-2xl text-center">
+                    <h3 class="text-2xl font-bold text-brand-babyblue mb-2">2. Database Search Race</h3>
+                    <p class="text-sm text-slate-300 mb-6">Find the red target. Classical checks 1-by-1. Quantum uses waves to check them all simultaneously.</p>
+                    
+                    <div id="search-grid" class="grid grid-cols-5 gap-2 mb-6 max-w-[250px] mx-auto">
+                        <!-- JS populates -->
+                    </div>
+
+                    <p id="search-status" class="text-white font-bold h-6 mb-6">Ready to search.</p>
+
+                    <div class="flex justify-center gap-2">
+                        <button onclick="runClassicalSearch()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg transition font-bold text-sm shadow-md">
+                            Classical
+                        </button>
+                        <button onclick="runQuantumSearch()" class="bg-brand-babyblue hover:bg-sky-400 text-brand-dark px-3 py-2 rounded-lg transition font-bold text-sm shadow-[0_0_10px_rgba(125,211,252,0.6)]">
+                            Quantum
+                        </button>
+                        <button onclick="resetSearch()" class="bg-transparent border border-slate-500 text-slate-300 px-3 py-2 rounded-lg hover:bg-slate-800">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Games Row -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <!-- Game 3: Entanglement Communicator -->
+                <div class="glass-card p-8 rounded-2xl text-center">
+                    <h3 class="text-2xl font-bold text-brand-red mb-2">3. Quantum Entanglement</h3>
+                    <p class="text-sm text-slate-300 mb-6">Entangled particles share states instantly across any distance. Try flipping Alice's particle.</p>
+                    
+                    <div class="flex items-center justify-between max-w-[300px] mx-auto mb-6 relative">
+                        <!-- Alice -->
+                        <div class="flex flex-col items-center z-10">
+                            <span class="text-xs text-brand-babyblue mb-1">Alice's Qubit</span>
+                            <div id="alice-particle" class="particle w-16 h-16 rounded-full bg-slate-700 border-2 border-slate-500 flex items-center justify-center text-2xl font-bold text-white cursor-pointer" onclick="flipAlice()">0</div>
+                        </div>
+                        <!-- Connection Line -->
+                        <div id="entangle-line" class="absolute top-1/2 left-0 right-0 h-1 bg-slate-600 -translate-y-1/2 z-0 border-t-2 border-dashed border-slate-500 transition-colors duration-300"></div>
+                        <!-- Bob -->
+                        <div class="flex flex-col items-center z-10">
+                            <span class="text-xs text-brand-red mb-1">Bob's Qubit</span>
+                            <div id="bob-particle" class="particle w-16 h-16 rounded-full bg-slate-700 border-2 border-slate-500 flex items-center justify-center text-2xl font-bold text-white">0</div>
+                        </div>
+                    </div>
+                    
+                    <p id="entangle-status" class="text-slate-400 font-bold h-6 mb-6 text-sm">Independent particles.</p>
+
+                    <button onclick="entangleParticles()" class="bg-brand-card border border-brand-red text-brand-red hover:bg-brand-red hover:text-white px-6 py-2 rounded-lg transition font-bold shadow-md">
+                        <i class="fa-solid fa-link mr-2"></i> Entangle Them
+                    </button>
+                </div>
+
+                <!-- Game 4: Exponential Scaling -->
+                <div class="glass-card p-8 rounded-2xl text-center">
+                    <h3 class="text-2xl font-bold text-brand-babyblue mb-2">4. Exponential Power (2ⁿ)</h3>
+                    <p class="text-sm text-slate-300 mb-6">A classical bit holds 1 state. Add qubits to see how simultaneous calculations grow exponentially.</p>
+                    
+                    <div class="text-4xl font-black text-white mb-2" id="qubit-states">
+                        2
+                    </div>
+                    <div class="text-sm text-brand-red font-bold mb-6 uppercase tracking-widest">Simultaneous States</div>
+                    
+                    <div class="flex items-center gap-4 max-w-[250px] mx-auto mb-4">
+                        <span class="text-brand-babyblue font-bold">1</span>
+                        <input type="range" min="1" max="16" value="1" class="w-full accent-brand-red" id="qubit-slider" oninput="updateQubits(this.value)">
+                        <span class="text-brand-red font-bold">16</span>
+                    </div>
+                    <p class="text-sm text-slate-400 font-semibold">Active Qubits: <span id="qubit-count" class="text-white text-lg ml-1">1</span></p>
+                </div>
+            </div>
+
+            <!-- Game 5: Decryption Race -->
+            <div class="glass-card p-8 rounded-2xl text-center max-w-3xl mx-auto border-t-4 border-t-brand-red">
+                <h3 class="text-2xl font-bold text-white mb-2">5. The Decryption Race (Shor's Algorithm)</h3>
+                <p class="text-sm text-slate-300 mb-6">Breaking a 2048-bit encryption padlock. Classical computers use brute force. Quantum uses wave interference to find the hidden pattern.</p>
+
+                <div class="mb-6 bg-slate-900 rounded-xl p-4 border border-slate-700 relative overflow-hidden flex flex-col gap-4">
+                    <i id="vault-icon" class="fa-solid fa-lock text-slate-500 text-4xl mb-2 transition-all duration-500"></i>
+                    
+                    <!-- Classical Bar -->
+                    <div class="text-left">
+                        <span class="text-xs text-slate-400 uppercase font-bold">Classical Supercomputer (Brute Force)</span>
+                        <div class="w-full bg-slate-800 rounded-full h-4 mt-1 overflow-hidden">
+                            <div id="classical-bar" class="bg-slate-500 h-4 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Quantum Bar -->
+                    <div class="text-left">
+                        <span class="text-xs text-brand-babyblue uppercase font-bold">Quantum Computer (Shor's Algorithm)</span>
+                        <div class="w-full bg-slate-800 rounded-full h-4 mt-1 overflow-hidden">
+                            <div id="quantum-bar" class="bg-brand-babyblue h-4 rounded-full shadow-[0_0_10px_#7dd3fc]" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <p id="hack-status" class="text-slate-400 font-bold h-6 mb-6 text-sm">Awaiting encryption breach command...</p>
+
+                <button onclick="startHack()" class="bg-brand-red hover:bg-brand-reddark text-white px-8 py-3 rounded-lg transition font-black shadow-[0_0_15px_rgba(239,68,68,0.5)] tracking-widest uppercase">
+                    Start Hack
+                </button>
+            </div>
+
+        </section>
+
+        <!-- ==================== TAB: CONCEPTS ==================== -->
+        <section id="tab-concepts" class="tab-content hidden space-y-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white mb-2">Core Concepts</h2>
+                <p class="text-brand-babyblue">The physics that makes it all possible.</p>
+            </div>
+
             <div class="grid md:grid-cols-2 gap-8">
-                <div class="glass-card p-8 rounded-xl">
-                    <h3 class="text-xl font-bold text-brand-gold mb-4">The 10th Grader Explanation</h3>
+                <div class="glass-card p-8 rounded-2xl border-l-4 border-l-brand-babyblue">
+                    <h3 class="text-2xl font-bold text-white mb-4">The 10th Grader Explanation</h3>
                     <p class="text-slate-300 leading-relaxed">
                         Imagine you're playing a video game with a "mystery loot box." The code says the box has a 50% chance of holding a health potion and a 50% chance of holding gold. In a normal game, the computer secretly picked the item the moment the box spawned. You just don't know it yet.
                         <br><br>
-                        But in a <em>quantum</em> game, the computer delays the choice. While the box sits there, it literally contains <strong>both</strong> the potion and the gold at the exact same time. It exists in a blur of possibilities called <strong>superposition</strong>. It is only at the exact fraction of a second you press "open" (measure it) that the box is forced to decide, and instantly becomes just one item.
+                        But in a <span class="text-brand-babyblue font-bold">quantum</span> game, the computer delays the choice. While the box sits there, it literally contains <strong>both</strong> the potion and the gold at the exact same time. It exists in a blur of possibilities called <strong class="text-brand-red">superposition</strong>. It is only at the exact fraction of a second you press "open" (measure it) that the box is forced to decide, and instantly becomes just one item.
                     </p>
                 </div>
-                <div class="glass-card p-8 rounded-xl border-red-500/30">
-                    <h3 class="text-xl font-bold text-red-400 mb-4"><i class="fa-solid fa-triangle-exclamation mr-2"></i>What People Get Wrong</h3>
-                    <p class="text-slate-300 leading-relaxed">
+                
+                <div class="glass-card p-8 rounded-2xl border-l-4 border-l-brand-red relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 opacity-10 text-9xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h3 class="text-2xl font-bold text-brand-red mb-4">What People Get Wrong</h3>
+                    <p class="text-slate-300 leading-relaxed relative z-10">
                         <strong>The Misconception:</strong> People think superposition means a quantum computer simply tries every possible answer at the exact same time, like a million classical computers working side-by-side.
                         <br><br>
-                        <strong>The Truth:</strong> A quantum computer doesn't test every path. It uses wave interference (like ripples in a pond). It essentially programs the "bad" answers to crash into each other and cancel themselves out, while amplifying the "correct" answer so it's the only one left when you open the box.
+                        <strong>The Truth:</strong> A quantum computer doesn't test every path independently. It uses wave <strong>interference</strong> (like ripples in a pond). It essentially programs the mathematical "bad" answers to crash into each other and cancel themselves out, while amplifying the "correct" answer so it's the only one left when you open the box.
                     </p>
+                </div>
+            </div>
+
+            <div class="glass-card p-8 rounded-2xl mt-8">
+                <h3 class="text-2xl font-bold text-white mb-4"><i class="fa-solid fa-shield-halved text-brand-red mr-2"></i> Algorithms: Shor's Algorithm</h3>
+                <p class="text-slate-300 leading-relaxed mb-4">
+                    Think of the internet like the massive combination padlocks on your gym lockers. Right now, all your text messages, banking info, and Snapchat data are locked inside a mathematical padlock. To pick this lock, a normal computer has to guess every single combination one by one. Because the math involves finding the prime factors of insanely large numbers, it would take a classical supercomputer millions of years to guess the combo.
+                </p>
+                <p class="text-slate-300 leading-relaxed mb-4">
+                    Enter <strong>Shor’s Algorithm</strong>. In 1994, Peter Shor figured out that a quantum computer doesn't have to guess combinations one by one. By using quantum wave interference, Shor's algorithm finds the hidden "period" or pattern inside that massive math problem, highlighting the right answer almost instantly.
+                </p>
+                <div class="bg-brand-red/20 border border-brand-red/50 p-4 rounded-lg mt-4 text-white">
+                    <strong>The Cyber Threat:</strong> Once we build a quantum computer powerful enough to run Shor's algorithm, every standard password and encrypted file on Earth could be cracked in hours. That's why the tech world is rushing to invent "Quantum-Safe" encryption right now!
                 </div>
             </div>
         </section>
 
-        <!-- Comparison Table Section -->
-        <section id="comparison" class="scroll-mt-24">
-            <div class="flex items-center gap-3 mb-8">
-                <i class="fa-solid fa-scale-balanced text-brand-gold text-2xl"></i>
-                <h2 class="text-3xl font-bold">Classical vs. Quantum</h2>
+        <!-- ==================== TAB: COMPARISON ==================== -->
+        <section id="tab-compare" class="tab-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white mb-2">Classical vs. Quantum</h2>
+                <p class="text-brand-babyblue">They are fundamentally different machines.</p>
             </div>
-            <div class="overflow-x-auto glass-card rounded-xl">
+
+            <div class="overflow-x-auto glass-card rounded-2xl border-brand-babyblue/30">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-brand-gold/30 bg-brand-blue/20">
-                            <th class="p-5 font-bold text-brand-gold">Feature</th>
-                            <th class="p-5 font-bold text-white">Classical Computing</th>
-                            <th class="p-5 font-bold text-brand-lightgold">Quantum Computing</th>
+                        <tr class="bg-brand-dark/80 border-b-2 border-brand-red">
+                            <th class="p-6 font-bold text-brand-babyblue text-lg">Feature</th>
+                            <th class="p-6 font-bold text-white text-lg"><i class="fa-solid fa-laptop mr-2"></i>Classical Computing</th>
+                            <th class="p-6 font-bold text-brand-red text-lg"><i class="fa-solid fa-microchip mr-2"></i>Quantum Computing</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-brand-gold/10 text-slate-300">
-                        <tr>
-                            <td class="p-5 font-semibold text-white">Data Storage</td>
-                            <td class="p-5"><strong>Bits:</strong> 0 or 1 (Transistors on a microchip)</td>
-                            <td class="p-5"><strong>Qubits:</strong> 0, 1, or both simultaneously (Subatomic particles/superconducting circuits)</td>
+                    <tbody class="divide-y divide-slate-700/50 text-slate-300">
+                        <tr class="hover:bg-slate-800/30 transition">
+                            <td class="p-6 font-semibold text-white">Data Storage</td>
+                            <td class="p-6"><strong>Bits:</strong> 0 or 1 (Transistors on a microchip)</td>
+                            <td class="p-6"><strong>Qubits:</strong> 0, 1, or both simultaneously (Subatomic particles or superconducting circuits)</td>
                         </tr>
-                        <tr>
-                            <td class="p-5 font-semibold text-white">Speed (Specific Tasks)</td>
-                            <td class="p-5">Linear scaling. Exponential time required for complex molecule simulations or breaking encryption.</td>
-                            <td class="p-5">Exponential scaling. Can solve specific optimization or chemistry problems in minutes instead of millennia.</td>
+                        <tr class="hover:bg-slate-800/30 transition">
+                            <td class="p-6 font-semibold text-white">Scaling Power</td>
+                            <td class="p-6"><strong>Linear scaling.</strong> Adding more transistors adds predictable power.</td>
+                            <td class="p-6"><strong>Exponential scaling.</strong> Adding just a few qubits doubles the simultaneous processing possibilities.</td>
                         </tr>
-                        <tr>
-                            <td class="p-5 font-semibold text-white">Best Use Cases</td>
-                            <td class="p-5">Everyday tasks, web browsing, databases, standard video games, and linear math.</td>
-                            <td class="p-5">Cryptography, drug discovery, financial modeling, battery material simulation, supply chain logistics.</td>
+                        <tr class="hover:bg-slate-800/30 transition">
+                            <td class="p-6 font-semibold text-white">Best Use Cases</td>
+                            <td class="p-6">Everyday tasks, web browsing, databases, standard video games, and linear math.</td>
+                            <td class="p-6">Cryptography, drug discovery, financial modeling, battery material simulation, supply chain logistics.</td>
                         </tr>
-                        <tr>
-                            <td class="p-5 font-semibold text-white">Current Limitations</td>
-                            <td class="p-5">Approaching the physical limit of how small we can make a silicon transistor.</td>
-                            <td class="p-5">"Decoherence." Extremely fragile. Requires temperatures near absolute zero; high error rates require massive error correction.</td>
+                        <tr class="hover:bg-slate-800/30 transition">
+                            <td class="p-6 font-semibold text-white">Current Limitations</td>
+                            <td class="p-6">Approaching the physical limit of how small we can make a silicon transistor.</td>
+                            <td class="p-6">"Decoherence." Extremely fragile. Requires temperatures near absolute zero; high error rates require massive error correction.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </section>
 
-        <!-- Algorithms Section -->
-        <section id="algorithms" class="scroll-mt-24">
-            <div class="flex items-center gap-3 mb-8">
-                <i class="fa-solid fa-shield-halved text-brand-gold text-2xl"></i>
-                <h2 class="text-3xl font-bold">Algorithms: Shor's Algorithm Explained</h2>
-            </div>
-            <div class="glass-card p-8 rounded-xl border-l-4 border-l-brand-gold">
-                <p class="text-slate-300 italic mb-4">"Hey everybody, let's talk about the algorithm that is keeping the NSA awake at night..."</p>
-                <p class="text-slate-300 leading-relaxed mb-4">
-                    If I'm talking to high schoolers here in Alabama, think of the internet like the massive combination padlocks on your gym lockers. Right now, all your text messages, banking info, and Snapchat data are locked inside a mathematical padlock. To pick this lock, a normal computer has to guess every single combination one by one. Because the math involves finding the prime factors of insanely large numbers, it would take a classical supercomputer millions of years to guess the combo. You are perfectly safe.
-                </p>
-                <p class="text-slate-300 leading-relaxed mb-4">
-                    Enter <strong>Shor’s Algorithm</strong>. In 1994, a mathematician named Peter Shor figured out that a quantum computer doesn't have to guess combinations one by one. By using quantum wave interference, Shor's algorithm finds the hidden "period" or pattern inside that massive math problem. It essentially highlights the exact right prime numbers almost instantly.
-                </p>
-                <p class="text-brand-lightgold font-semibold">
-                    The takeaway? Once we build a quantum computer powerful enough to run Shor's algorithm, every single standard password, encrypted file, and secure communication on Earth can be cracked in hours. That's why the cybersecurity world is rushing to invent "Quantum-Safe" encryption right now!
-                </p>
+            <!-- Debate Card -->
+            <div class="mt-8 glass-card p-6 rounded-2xl border-l-4 border-l-brand-red">
+                <h3 class="text-xl font-bold text-white mb-2">Critical Thinking: The "Supremacy" Debate</h3>
+                <p class="text-sm text-slate-300 mb-2">In 2019, Google announced their processor completed a complex task in 200 seconds that would take a supercomputer 10,000 years (dubbed "Quantum Supremacy").</p>
+                <p class="text-sm text-brand-babyblue font-semibold">IBM pushed back, arguing that if you utilized the massive disk storage of their classical supercomputer correctly, it would only take 2.5 days, not 10,000 years. The reality is that classical computers are improving too. The future isn't quantum replacing classical, but rather a "hybrid" tug-of-war where they work together.</p>
             </div>
         </section>
 
-        <!-- Applications Section -->
-        <section id="applications" class="scroll-mt-24">
-            <div class="flex items-center gap-3 mb-8">
-                <i class="fa-solid fa-earth-americas text-brand-gold text-2xl"></i>
-                <h2 class="text-3xl font-bold">Top 5 Real-World Applications (Next 10 Years)</h2>
+        <!-- ==================== TAB: APPLICATIONS ==================== -->
+        <section id="tab-applications" class="tab-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white mb-2">Top 5 Real-World Applications</h2>
+                <p class="text-brand-babyblue">Expected to change the world within the next 10 years.</p>
             </div>
+
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- App 1 -->
-                <div class="bg-brand-dark border border-brand-gold/30 p-6 rounded-xl hover:border-brand-gold transition duration-300 relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-7xl text-brand-blue/30 font-bold">1</div>
-                    <h3 class="text-xl font-bold text-brand-gold mb-2 relative z-10">Material Science & Chemistry</h3>
-                    <p class="text-sm text-slate-300 relative z-10"><strong>Why it matters:</strong> Simulating molecules at the subatomic level perfectly. This will allow us to invent room-temperature superconductors, vastly superior EV batteries, and low-energy fertilizers (disrupting the Haber-Bosch process to save 2% of global energy).</p>
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-brand-red relative overflow-hidden group">
+                    <div class="absolute -right-2 -top-6 text-8xl text-brand-red/10 font-black group-hover:text-brand-red/20 transition">1</div>
+                    <h3 class="text-xl font-bold text-white mb-2 relative z-10">Material Science</h3>
+                    <p class="text-sm text-slate-300 relative z-10">Simulating molecules perfectly at the subatomic level. This will allow us to invent room-temperature superconductors, vastly superior EV batteries, and low-energy fertilizers.</p>
                 </div>
                 <!-- App 2 -->
-                <div class="bg-brand-dark border border-brand-gold/30 p-6 rounded-xl hover:border-brand-gold transition duration-300 relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-7xl text-brand-blue/30 font-bold">2</div>
-                    <h3 class="text-xl font-bold text-brand-gold mb-2 relative z-10">Drug Discovery</h3>
-                    <p class="text-sm text-slate-300 relative z-10"><strong>Why it matters:</strong> Instead of decades of trial-and-error in a lab, quantum computers can accurately simulate how complex proteins fold and how specific drugs will interact with the human body, accelerating cures for diseases like Alzheimer's.</p>
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-brand-babyblue relative overflow-hidden group">
+                    <div class="absolute -right-2 -top-6 text-8xl text-brand-babyblue/10 font-black group-hover:text-brand-babyblue/20 transition">2</div>
+                    <h3 class="text-xl font-bold text-white mb-2 relative z-10">Drug Discovery</h3>
+                    <p class="text-sm text-slate-300 relative z-10">Instead of decades of trial-and-error in a lab, quantum computers can accurately simulate how complex proteins fold and how specific drugs will interact with the human body.</p>
                 </div>
                 <!-- App 3 -->
-                <div class="bg-brand-dark border border-brand-gold/30 p-6 rounded-xl hover:border-brand-gold transition duration-300 relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-7xl text-brand-blue/30 font-bold">3</div>
-                    <h3 class="text-xl font-bold text-brand-gold mb-2 relative z-10">Cybersecurity</h3>
-                    <p class="text-sm text-slate-300 relative z-10"><strong>Why it matters:</strong> As mentioned with Shor's Algorithm, quantum will break RSA encryption. But it also creates "Quantum Key Distribution" (QKD)—a method of encrypting data using the laws of physics that is theoretically un-hackable.</p>
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-brand-red relative overflow-hidden group">
+                    <div class="absolute -right-2 -top-6 text-8xl text-brand-red/10 font-black group-hover:text-brand-red/20 transition">3</div>
+                    <h3 class="text-xl font-bold text-white mb-2 relative z-10">Cybersecurity</h3>
+                    <p class="text-sm text-slate-300 relative z-10">While quantum will break current encryption, it also creates "Quantum Key Distribution" (QKD)—a method of encrypting data using the laws of physics that is theoretically un-hackable.</p>
                 </div>
                 <!-- App 4 -->
-                <div class="bg-brand-dark border border-brand-gold/30 p-6 rounded-xl hover:border-brand-gold transition duration-300 relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-7xl text-brand-blue/30 font-bold">4</div>
-                    <h3 class="text-xl font-bold text-brand-gold mb-2 relative z-10">Logistics & Optimization</h3>
-                    <p class="text-sm text-slate-300 relative z-10"><strong>Why it matters:</strong> Solving the "Traveling Salesman" problem on a massive scale. Optimizing global shipping routes, airline schedules, and power grid distribution simultaneously, saving billions of dollars and slashing carbon emissions.</p>
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-brand-babyblue relative overflow-hidden group">
+                    <div class="absolute -right-2 -top-6 text-8xl text-brand-babyblue/10 font-black group-hover:text-brand-babyblue/20 transition">4</div>
+                    <h3 class="text-xl font-bold text-white mb-2 relative z-10">Logistics</h3>
+                    <p class="text-sm text-slate-300 relative z-10">Solving the "Traveling Salesman" problem on a massive scale. Optimizing global shipping routes, airline schedules, and power grids simultaneously to save billions.</p>
                 </div>
                 <!-- App 5 -->
-                <div class="bg-brand-dark border border-brand-gold/30 p-6 rounded-xl hover:border-brand-gold transition duration-300 relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-7xl text-brand-blue/30 font-bold">5</div>
-                    <h3 class="text-xl font-bold text-brand-gold mb-2 relative z-10">Financial Modeling</h3>
-                    <p class="text-sm text-slate-300 relative z-10"><strong>Why it matters:</strong> Wall Street will use quantum algorithms to instantly assess millions of risk factors in market volatility, optimizing investment portfolios and predicting economic shifts far faster than classical supercomputers.</p>
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-brand-red relative overflow-hidden group">
+                    <div class="absolute -right-2 -top-6 text-8xl text-brand-red/10 font-black group-hover:text-brand-red/20 transition">5</div>
+                    <h3 class="text-xl font-bold text-white mb-2 relative z-10">Financial Modeling</h3>
+                    <p class="text-sm text-slate-300 relative z-10">Wall Street will use quantum algorithms to instantly assess millions of risk factors in market volatility, predicting economic shifts far faster than classical supercomputers.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Alabama Section -->
-        <section id="alabama" class="scroll-mt-24">
-            <div class="flex items-center gap-3 mb-8">
-                <i class="fa-solid fa-rocket text-brand-gold text-2xl"></i>
-                <h2 class="text-3xl font-bold">The Alabama Hub: Huntsville & Redstone</h2>
+        <!-- ==================== TAB: ALABAMA HUB & CAREERS ==================== -->
+        <section id="tab-alabama" class="tab-content hidden space-y-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white mb-2">The Alabama Hub & Your Future</h2>
+                <p class="text-brand-babyblue">Huntsville is at the forefront of the quantum defense revolution.</p>
             </div>
-            <div class="glass-card p-8 rounded-xl flex flex-col md:flex-row gap-8 items-center">
+
+            <!-- Alabama Info -->
+            <div class="glass-card p-8 rounded-2xl flex flex-col md:flex-row gap-8 items-center border border-brand-babyblue/40">
                 <div class="w-full md:w-2/3">
+                    <h3 class="text-2xl font-bold text-white mb-4">Huntsville & Redstone Arsenal</h3>
                     <p class="text-slate-300 leading-relaxed mb-4">
-                        Huntsville, Alabama—known as the Rocket City—is rapidly pivoting its massive defense and aerospace infrastructure to become a powerhouse in Quantum Information Science.
+                        Known as the Rocket City, Huntsville is rapidly pivoting its massive aerospace infrastructure to become a powerhouse in Quantum Information Science.
                     </p>
                     <ul class="space-y-4 text-slate-300">
                         <li class="flex items-start">
-                            <i class="fa-solid fa-check text-brand-gold mt-1 mr-3"></i>
-                            <div><strong>Southeastern Quantum Collaborative (SQC):</strong> Led by the University of Alabama in Huntsville (UAH), this coalition bridges local universities (like Alabama A&M) with tech giants to develop field-ready quantum tech for the military.</div>
+                            <i class="fa-solid fa-satellite-dish text-brand-babyblue mt-1 mr-3 text-lg"></i>
+                            <div><strong>Southeastern Quantum Collaborative:</strong> Led by UAH, bridging local universities (like Alabama A&M) with tech giants to develop field-ready quantum tech for the military.</div>
                         </li>
                         <li class="flex items-start">
-                            <i class="fa-solid fa-check text-brand-gold mt-1 mr-3"></i>
-                            <div><strong>Redstone Arsenal & Davidson Technologies:</strong> In partnership with D-Wave, Davidson Technologies recently installed a dedicated quantum annealing computer in Huntsville to optimize missile defense planning and simulate complex global threat scenarios.</div>
+                            <i class="fa-solid fa-microchip text-brand-red mt-1 mr-3 text-lg"></i>
+                            <div><strong>Davidson Technologies & D-Wave:</strong> Recently installed a dedicated quantum annealing computer in Huntsville to optimize missile defense planning and complex global threat scenarios.</div>
                         </li>
                         <li class="flex items-start">
-                            <i class="fa-solid fa-check text-brand-gold mt-1 mr-3"></i>
-                            <div><strong>UAH Department of Physics:</strong> Researchers at UAH are heavily invested in quantum sensing and hardware materials, combining quantum architecture with machine learning at their new High Performance Computing Center.</div>
+                            <i class="fa-solid fa-graduation-cap text-brand-babyblue mt-1 mr-3 text-lg"></i>
+                            <div><strong>UAH Dept of Physics:</strong> Researchers are actively combining quantum architecture with machine learning at their new High Performance Computing Center.</div>
                         </li>
                     </ul>
                 </div>
-                <div class="w-full md:w-1/3 bg-brand-blue/30 p-6 rounded-lg border border-brand-blue text-center">
-                    <i class="fa-solid fa-satellite-dish text-5xl text-brand-gold mb-4"></i>
+                <div class="w-full md:w-1/3 bg-slate-900 p-6 rounded-xl border border-brand-red/50 text-center shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+                    <i class="fa-solid fa-shield-cat text-5xl text-brand-red mb-4"></i>
                     <h4 class="text-lg font-bold text-white mb-2">Defense Priority</h4>
-                    <p class="text-sm text-slate-300">Huntsville's primary focus isn't just theory; it's pragmatic, tactical applications for the warfighter, from un-jammable quantum GPS navigation to secure comms.</p>
+                    <p class="text-sm text-slate-400">Huntsville's focus is tactical applications for the warfighter, from un-jammable quantum GPS to secure comms.</p>
                 </div>
             </div>
-        </section>
 
-        <!-- Careers Section -->
-        <section id="careers" class="scroll-mt-24">
-            <div class="flex items-center gap-3 mb-8">
-                <i class="fa-solid fa-user-astronaut text-brand-gold text-2xl"></i>
-                <h2 class="text-3xl font-bold">Quantum Careers by 2035</h2>
-            </div>
+            <!-- Careers -->
             <div class="grid md:grid-cols-2 gap-8">
-                <div class="bg-slate-800 rounded-xl p-8 border border-slate-700">
-                    <h3 class="text-xl font-bold text-white mb-4">The Jobs of the Future</h3>
-                    <ul class="space-y-3 text-slate-300">
-                        <li><span class="text-brand-gold font-bold">1. Quantum Algorithm Engineer:</span> Writing the actual code (like Qiskit) that tells qubits what to do.</li>
-                        <li><span class="text-brand-gold font-bold">2. Cryogenics Technician:</span> Managing the ultra-cooling systems (near absolute zero) required to keep quantum hardware stable.</li>
-                        <li><span class="text-brand-gold font-bold">3. Error-Correction Specialist:</span> Designing logic to clean up the "noise" and fragility of quantum processors.</li>
-                        <li><span class="text-brand-gold font-bold">4. Quantum-Safe Cybersecurity Analyst:</span> Helping companies transition their networks away from classical encryption before Shor's algorithm becomes a threat.</li>
+                <div class="glass-card p-8 rounded-2xl">
+                    <h3 class="text-xl font-bold text-brand-babyblue mb-4">Quantum Careers by 2035</h3>
+                    <ul class="space-y-3 text-slate-300 text-sm">
+                        <li><strong class="text-white">Quantum Algorithm Engineer:</strong> Writing the code (like Qiskit) that tells qubits what to do.</li>
+                        <li><strong class="text-white">Cryogenics Technician:</strong> Managing the ultra-cooling systems (near absolute zero).</li>
+                        <li><strong class="text-white">Error-Correction Specialist:</strong> Designing logic to clean up the "noise" of quantum processors.</li>
+                        <li><strong class="text-white">Quantum-Safe Analyst:</strong> Transitioning networks away from classical encryption.</li>
                     </ul>
                 </div>
-                <div class="glass-card rounded-xl p-8">
-                    <h3 class="text-xl font-bold text-brand-gold mb-4">What High Schoolers Should Study Now</h3>
-                    <p class="text-slate-300 mb-4">You don't just need a PhD in theoretical physics to work in this industry. Here is the path:</p>
+                <div class="glass-card p-8 rounded-2xl bg-gradient-to-br from-brand-dark to-slate-800 border-brand-red/30">
+                    <h3 class="text-xl font-bold text-brand-red mb-4">What High Schoolers Should Study</h3>
+                    <p class="text-slate-300 text-sm mb-4">You don't just need a PhD in theoretical physics. Start building these skills:</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="px-3 py-1 bg-brand-blue/50 text-brand-lightgold text-sm rounded-full border border-brand-gold/50">Linear Algebra</span>
-                        <span class="px-3 py-1 bg-brand-blue/50 text-brand-lightgold text-sm rounded-full border border-brand-gold/50">Python (Qiskit)</span>
-                        <span class="px-3 py-1 bg-brand-blue/50 text-brand-lightgold text-sm rounded-full border border-brand-gold/50">Probability & Statistics</span>
-                        <span class="px-3 py-1 bg-brand-blue/50 text-brand-lightgold text-sm rounded-full border border-brand-gold/50">Materials Science</span>
+                        <span class="px-3 py-1 bg-brand-babyblue/20 text-brand-babyblue text-xs rounded-full border border-brand-babyblue/50">Linear Algebra</span>
+                        <span class="px-3 py-1 bg-brand-red/20 text-brand-red text-xs rounded-full border border-brand-red/50">Python (Qiskit)</span>
+                        <span class="px-3 py-1 bg-brand-babyblue/20 text-brand-babyblue text-xs rounded-full border border-brand-babyblue/50">Probability</span>
+                        <span class="px-3 py-1 bg-brand-red/20 text-brand-red text-xs rounded-full border border-brand-red/50">Materials Science</span>
                     </div>
-                    <p class="text-sm text-slate-300">
-                        Start learning Python right now. IBM offers a free, open-source SDK called <strong>Qiskit</strong> that allows anyone to experiment with quantum circuits on their home computer. Combine computer science with advanced math and physics.
+                    <p class="text-xs text-slate-400">
+                        Start learning Python now. IBM offers a free SDK called <strong>Qiskit</strong> to experiment with quantum circuits at home!
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- Critical Thinking Section -->
-        <section id="debate" class="scroll-mt-24">
-            <div class="flex items-center gap-3 mb-8">
-                <i class="fa-solid fa-scale-unbalanced text-brand-gold text-2xl"></i>
-                <h2 class="text-3xl font-bold">Critical Thinking: The "Supremacy" Debate</h2>
+        <!-- ==================== TAB: PICTURES ==================== -->
+        <section id="tab-pictures" class="tab-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white mb-2">Visualizing Quantum</h2>
+                <p class="text-brand-babyblue">What does a quantum computer actually look like?</p>
             </div>
-            <div class="glass-card p-8 rounded-xl border-l-4 border-l-red-500">
-                <h3 class="text-xl font-bold text-white mb-4">Did Google Really Achieve Quantum Supremacy in 2019?</h3>
-                <p class="text-slate-300 leading-relaxed mb-4">
-                    In 2019, Google announced their Sycamore processor completed a complex math task in 200 seconds that would take the world's fastest classical supercomputer 10,000 years. This was dubbed <strong>"Quantum Supremacy."</strong> 
-                </p>
-                <p class="text-slate-300 leading-relaxed mb-4">
-                    <strong>The Critics (Led by IBM):</strong> IBM strongly pushed back on this claim. They published a counter-paper arguing that Google severely underestimated classical computers. IBM stated that if you utilized the massive disk storage of their Summit supercomputer (using secondary storage to hold the massive tensor networks), the classical machine could actually solve the problem in <strong>2.5 days</strong>, not 10,000 years. 
-                </p>
-                <p class="text-slate-300 leading-relaxed">
-                    <strong>The Reality:</strong> While 200 seconds vs 2.5 days is still an incredible leap in speed, IBM highlighted that "Quantum Advantage" is a moving target. Classical algorithms and supercomputers are also improving rapidly. The debate proves that for the foreseeable future, quantum won't instantly obliterate classical computing; the two will engage in a competitive, hybrid tug-of-war.
-                </p>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="glass-card p-6 rounded-2xl border-t-4 border-t-brand-babyblue group">
+                    <div class="overflow-hidden rounded-xl mb-4 bg-[#0a0f1c] flex justify-center items-center h-64 p-2">
+                        <!-- Custom Built-in SVG of the Golden Chandelier -->
+                        <svg viewBox="0 0 200 300" class="h-full w-full object-contain group-hover:scale-105 transition duration-500" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#b48c36"/>
+                                    <stop offset="50%" stop-color="#fbbf24"/>
+                                    <stop offset="100%" stop-color="#b48c36"/>
+                                </linearGradient>
+                                <linearGradient id="gold-dark" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#78591c"/>
+                                    <stop offset="50%" stop-color="#b48c36"/>
+                                    <stop offset="100%" stop-color="#78591c"/>
+                                </linearGradient>
+                            </defs>
+                            <!-- Top plate -->
+                            <ellipse cx="100" cy="40" rx="60" ry="15" fill="url(#gold)"/>
+                            <rect x="40" y="40" width="120" height="20" fill="url(#gold)"/>
+                            <ellipse cx="100" cy="60" rx="60" ry="15" fill="url(#gold-dark)"/>
+                            <!-- Mid plate -->
+                            <ellipse cx="100" cy="120" rx="50" ry="12" fill="url(#gold)"/>
+                            <rect x="50" y="120" width="100" height="15" fill="url(#gold)"/>
+                            <ellipse cx="100" cy="135" rx="50" ry="12" fill="url(#gold-dark)"/>
+                            <!-- Bottom plate -->
+                            <ellipse cx="100" cy="190" rx="35" ry="8" fill="url(#gold)"/>
+                            <rect x="65" y="190" width="70" height="10" fill="url(#gold)"/>
+                            <ellipse cx="100" cy="200" rx="35" ry="8" fill="url(#gold-dark)"/>
+                            <!-- Chip plate -->
+                            <ellipse cx="100" cy="250" rx="20" ry="5" fill="url(#gold)"/>
+                            <!-- Wires/Tubes -->
+                            <path d="M70,60 L70,120 M130,60 L130,120 M85,60 L85,120 M115,60 L115,120" stroke="url(#gold)" stroke-width="4"/>
+                            <path d="M75,135 L80,190 M125,135 L120,190 M95,135 L95,190 M105,135 L105,190" stroke="url(#gold)" stroke-width="3"/>
+                            <path d="M85,200 L90,250 M115,200 L110,250 M100,200 L100,250" stroke="url(#gold)" stroke-width="2"/>
+                            <!-- Glowing Qubit Chip -->
+                            <circle cx="100" cy="255" r="4" fill="#7dd3fc" filter="drop-shadow(0 0 5px #7dd3fc)"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">The Golden "Chandelier"</h3>
+                    <p class="text-sm text-slate-300">This intricate gold structure isn't the quantum chip itself. It is a massive, multi-stage dilution refrigerator. Its job is to cool the tiny quantum processor at the very bottom down to temperatures near absolute zero (-459°F), colder than deep space, to keep the qubits stable.</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl border-t-4 border-t-brand-red group">
+                    <div class="overflow-hidden rounded-xl mb-4 bg-slate-200 flex justify-center items-center h-64 p-4">
+                        <!-- Custom Built-in SVG of the Bloch Sphere -->
+                        <svg viewBox="0 0 200 200" class="h-full w-full object-contain group-hover:scale-105 transition duration-500" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Sphere outline -->
+                            <circle cx="100" cy="100" r="80" fill="none" stroke="#94a3b8" stroke-width="2"/>
+                            <!-- Equator & Meridian -->
+                            <ellipse cx="100" cy="100" rx="80" ry="25" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5,5"/>
+                            <ellipse cx="100" cy="100" rx="25" ry="80" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5,5"/>
+                            <!-- Axes -->
+                            <line x1="100" y1="20" x2="100" y2="180" stroke="#64748b" stroke-width="1"/>
+                            <line x1="20" y1="100" x2="180" y2="100" stroke="#64748b" stroke-width="1"/>
+                            <line x1="40" y1="160" x2="160" y2="40" stroke="#64748b" stroke-width="1"/>
+                            <!-- Labels -->
+                            <text x="92" y="15" fill="#0f172a" font-family="sans-serif" font-weight="bold" font-size="14">|0⟩</text>
+                            <text x="92" y="195" fill="#0f172a" font-family="sans-serif" font-weight="bold" font-size="14">|1⟩</text>
+                            <text x="5" y="105" fill="#64748b" font-family="sans-serif" font-size="12">-x</text>
+                            <text x="180" y="105" fill="#64748b" font-family="sans-serif" font-size="12">+x</text>
+                            <!-- Vector Arrow representing Superposition -->
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444" />
+                                </marker>
+                            </defs>
+                            <line x1="100" y1="100" x2="140" y2="40" stroke="#ef4444" stroke-width="3" marker-end="url(#arrowhead)"/>
+                            <!-- Vector Label -->
+                            <text x="145" y="35" fill="#ef4444" font-family="sans-serif" font-weight="bold" font-size="16">|ψ⟩</text>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">The Bloch Sphere</h3>
+                    <p class="text-sm text-slate-300">This is a geometric diagram used by scientists to visualize a qubit. A classical bit can only point straight up (0) or straight down (1). A qubit in superposition, however, can exist as an arrow pointing anywhere on the surface of this entire sphere.</p>
+                </div>
+                
+                <!-- NEW SVG 3 -->
+                <div class="glass-card p-6 rounded-2xl border-t-4 border-t-brand-babyblue group">
+                    <div class="overflow-hidden rounded-xl mb-4 bg-slate-800 flex justify-center items-center h-64 p-4 border border-slate-600">
+                        <svg viewBox="0 0 300 150" class="h-full w-full object-contain group-hover:scale-105 transition duration-500" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Lines -->
+                            <line x1="40" y1="50" x2="260" y2="50" stroke="#7dd3fc" stroke-width="4"/>
+                            <line x1="40" y1="100" x2="260" y2="100" stroke="#ef4444" stroke-width="4"/>
+                            <!-- Qubit labels -->
+                            <text x="5" y="55" fill="#7dd3fc" font-family="monospace" font-weight="bold" font-size="14">q0 |0⟩</text>
+                            <text x="5" y="105" fill="#ef4444" font-family="monospace" font-weight="bold" font-size="14">q1 |0⟩</text>
+                            <!-- Hadamard Gate -->
+                            <rect x="80" y="30" width="40" height="40" fill="#0f172a" stroke="#7dd3fc" stroke-width="2" rx="4"/>
+                            <text x="100" y="56" fill="#7dd3fc" font-family="sans-serif" font-weight="bold" font-size="18" text-anchor="middle">H</text>
+                            <!-- CNOT Gate -->
+                            <circle cx="160" cy="50" r="6" fill="#7dd3fc"/>
+                            <line x1="160" y1="50" x2="160" y2="100" stroke="#7dd3fc" stroke-width="2"/>
+                            <circle cx="160" cy="100" r="15" fill="#0f172a" stroke="#ef4444" stroke-width="2"/>
+                            <line x1="160" y1="85" x2="160" y2="115" stroke="#ef4444" stroke-width="2"/>
+                            <line x1="145" y1="100" x2="175" y2="100" stroke="#ef4444" stroke-width="2"/>
+                            <!-- Measurement -->
+                            <rect x="210" y="30" width="40" height="40" fill="#0f172a" stroke="#94a3b8" stroke-width="2" rx="4"/>
+                            <path d="M215,55 A 15 15 0 0 1 245 55" fill="none" stroke="#94a3b8" stroke-width="2"/>
+                            <line x1="230" y1="55" x2="240" y2="40" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Quantum Circuit & Gates</h3>
+                    <p class="text-sm text-slate-300">This is how code actually looks in quantum computing! The "H" block is a Hadamard gate, which throws a qubit into superposition. The linked circles represent a CNOT gate, entangling two qubits together before the final measurement dial.</p>
+                </div>
+                
+                <!-- NEW SVG 4 -->
+                <div class="glass-card p-6 rounded-2xl border-t-4 border-t-brand-red group">
+                    <div class="overflow-hidden rounded-xl mb-4 bg-black flex justify-center items-center h-64 p-4 border border-slate-700">
+                        <svg viewBox="0 0 200 200" class="h-full w-full object-contain group-hover:scale-105 transition duration-500" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="20" y="20" width="160" height="160" fill="#111" stroke="#333" stroke-width="4" rx="10"/>
+                            <rect x="30" y="30" width="140" height="140" fill="#0a0a0a" stroke="#444" stroke-width="2" rx="5"/>
+                            <!-- Qubits (Cross shapes common in transmon qubits) -->
+                            <g stroke="#7dd3fc" stroke-width="4" fill="none">
+                                <path d="M 60 50 L 60 70 M 50 60 L 70 60" />
+                                <path d="M 140 50 L 140 70 M 130 60 L 150 60" />
+                                <path d="M 60 130 L 60 150 M 50 140 L 70 140" />
+                                <path d="M 140 130 L 140 150 M 130 140 L 150 140" />
+                                <path d="M 100 90 L 100 110 M 90 100 L 110 100" stroke="#ef4444"/>
+                            </g>
+                            <!-- Microwave Resonator zig-zags (Buses) -->
+                            <g stroke="#fbbf24" stroke-width="1.5" fill="none" opacity="0.8">
+                                <path d="M 70 60 Q 85 50 85 60 T 100 60 T 115 60 T 130 60" />
+                                <path d="M 70 140 Q 85 130 85 140 T 100 140 T 115 140 T 130 140" />
+                                <path d="M 60 70 Q 50 85 60 85 T 60 100 T 60 115 T 60 130" />
+                                <path d="M 140 70 Q 130 85 140 85 T 140 100 T 140 115 T 140 130" />
+                                <path d="M 70 70 Q 85 85 90 90" />
+                                <path d="M 130 70 Q 115 85 110 90" />
+                                <path d="M 70 130 Q 85 115 90 110" />
+                                <path d="M 130 130 Q 115 115 110 110" />
+                            </g>
+                            <!-- Readout lines -->
+                            <path d="M 20 60 L 40 60 M 160 60 L 180 60 M 20 140 L 40 140 M 160 140 L 180 140" stroke="#ef4444" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">The QPU (Quantum Processor Unit)</h3>
+                    <p class="text-sm text-slate-300">A close-up illustration of a superconducting quantum chip. The crosses are "transmon" qubits. The squiggly gold lines are microwave resonators that act as a bus, allowing the individual qubits to share information and become entangled.</p>
+                </div>
             </div>
         </section>
 
-        <!-- Resources Section -->
-        <section id="resources" class="scroll-mt-24 border-t border-brand-gold/20 pt-12 pb-12">
-            <h2 class="text-2xl font-bold mb-6">Resources & Further Reading</h2>
-            <div class="flex flex-wrap gap-4">
-                <a href="#" class="px-6 py-3 bg-slate-800 hover:bg-brand-blue text-white rounded-lg transition border border-slate-700 hover:border-brand-gold">
-                    <i class="fa-brands fa-ibm mr-2 text-brand-gold"></i> IBM Quantum Learning
-                </a>
-                <a href="#" class="px-6 py-3 bg-slate-800 hover:bg-brand-blue text-white rounded-lg transition border border-slate-700 hover:border-brand-gold">
-                    <i class="fa-solid fa-file-pdf mr-2 text-brand-gold"></i> PatentPC Speed Stats
-                </a>
-                <a href="#" class="px-6 py-3 bg-slate-800 hover:bg-brand-blue text-white rounded-lg transition border border-slate-700 hover:border-brand-gold">
-                    <i class="fa-solid fa-building-columns mr-2 text-brand-gold"></i> UAH Physics Research
-                </a>
-                <a href="#" class="px-6 py-3 bg-slate-800 hover:bg-brand-blue text-white rounded-lg transition border border-slate-700 hover:border-brand-gold">
-                    <i class="fa-solid fa-briefcase mr-2 text-brand-gold"></i> SeedLegals: Startup Guide
-                </a>
+        <!-- ==================== TAB: VIDEOS ==================== -->
+        <section id="tab-videos" class="tab-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white mb-2">Learn More: Video Explainers</h2>
+                <p class="text-brand-babyblue">Deepen your understanding with these excellent breakdowns.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Video 1 -->
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-l-brand-red">
+                    <div class="aspect-video w-full rounded-xl overflow-hidden mb-4 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/JhHMJCUmq28" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Quantum Computers Explained</h3>
+                    <p class="text-sm text-slate-300">Produced by Kurzgesagt – In a Nutshell. This is one of the best animated explanations on the internet, perfect for visualizing how quantum mechanics changes computation.</p>
+                </div>
+
+                <!-- Video 2 -->
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-l-brand-babyblue">
+                    <div class="aspect-video w-full rounded-xl overflow-hidden mb-4 shadow-[0_0_15px_rgba(125,211,252,0.3)]">
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/QuR969uMICM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">How Does a Quantum Computer Work?</h3>
+                    <p class="text-sm text-slate-300">A brilliant TED-Ed lesson that dives slightly deeper into the physics and math. It breaks down how wave interference actually helps scientists find the right answers.</p>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-brand-dark border-t border-brand-gold/30 py-8 text-center">
+    <footer class="mt-auto border-t border-slate-800 py-6 text-center bg-black/40">
         <p class="text-slate-500 text-sm">
-            Designed for educational synthesis. Featuring insights on Quantum Superposition, Algorithms, and the Alabama Aerospace Hub.
+            Designed for interactive learning. Explore the Quantum Shift.
         </p>
     </footer>
 
+    <!-- Interactive Logic -->
+    <script>
+        // ================= Theme Switcher Logic =================
+        function toggleThemeMenu() {
+            const menu = document.getElementById('theme-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Close dropdown if clicked outside
+        window.onclick = function(event) {
+            if (!event.target.closest('.relative.inline-block')) {
+                const dropdowns = document.getElementById('theme-menu');
+                if (!dropdowns.classList.contains('hidden')) {
+                    dropdowns.classList.add('hidden');
+                }
+            }
+        }
+
+        function setTheme(themeClass, displayName) {
+            // Remove existing theme classes from body
+            document.body.className = document.body.className.replace(/\btheme-[a-z]+\b/g, '').trim();
+            // Add new theme class
+            document.body.classList.add('theme-' + themeClass);
+            // Update button text
+            document.getElementById('current-theme-name').innerText = displayName;
+            // Hide menu
+            document.getElementById('theme-menu').classList.add('hidden');
+        }
+
+        // ================= Tab Switching Logic =================
+        function openTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-brand-red', 'text-white', 'shadow-lg');
+                el.classList.add('bg-transparent', 'text-brand-babyblue', 'hover:bg-slate-700');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            btnElement.classList.remove('bg-transparent', 'text-brand-babyblue', 'hover:bg-slate-700');
+            btnElement.classList.add('bg-brand-red', 'text-white', 'shadow-lg');
+        }
+
+        // ================= Game 1: Superposition Coin =================
+        let coinSpinning = false;
+        let coinInterval;
+
+        function startSuperposition() {
+            const coin = document.getElementById('quantum-coin');
+            const status = document.getElementById('coin-status');
+            if (coinSpinning) return;
+            coinSpinning = true;
+            status.innerText = "Superposition: Existing as 0 and 1 simultaneously...";
+            status.classList.add('glow-text');
+            coinInterval = setInterval(() => {
+                const isZero = Math.random() > 0.5;
+                coin.innerText = isZero ? "0" : "1";
+                coin.style.background = isZero ? "#7dd3fc" : "#ef4444"; 
+                coin.style.transform = `rotateY(${Math.random() * 360}deg)`;
+            }, 80);
+        }
+
+        function measureCoin() {
+            const coin = document.getElementById('quantum-coin');
+            const status = document.getElementById('coin-status');
+            if (!coinSpinning) {
+                status.innerText = "You have to put it in Superposition (Spin) first!";
+                status.classList.remove('glow-text');
+                return;
+            }
+            coinSpinning = false;
+            clearInterval(coinInterval);
+            const finalState = Math.random() > 0.5 ? "0" : "1";
+            coin.innerText = finalState;
+            coin.style.transform = `rotateY(0deg)`;
+            if (finalState === "0") {
+                coin.style.background = "#7dd3fc"; 
+                status.innerHTML = `Measured! Wave collapsed to <span class="text-brand-babyblue text-xl">0</span>`;
+            } else {
+                coin.style.background = "#ef4444"; 
+                status.innerHTML = `Measured! Wave collapsed to <span class="text-brand-red text-xl">1</span>`;
+            }
+            status.classList.remove('glow-text');
+        }
+
+        // ================= Game 2: Search Race =================
+        const grid = document.getElementById('search-grid');
+        const searchStatus = document.getElementById('search-status');
+        const numBoxes = 25;
+        let targetIndex = Math.floor(Math.random() * numBoxes);
+        let searching = false;
+
+        function initGrid() {
+            grid.innerHTML = '';
+            for(let i=0; i<numBoxes; i++) {
+                const box = document.createElement('div');
+                box.className = 'search-box w-full h-8 bg-slate-700 rounded border border-slate-600 flex items-center justify-center text-xs text-transparent font-bold';
+                box.id = `box-${i}`;
+                box.innerText = "X";
+                grid.appendChild(box);
+            }
+            targetIndex = Math.floor(Math.random() * numBoxes);
+        }
+        initGrid();
+
+        function resetSearch() {
+            if(searching) return;
+            initGrid();
+            searchStatus.innerText = "Grid reset. Ready to search.";
+            searchStatus.className = "text-white font-bold h-6 mb-6";
+        }
+
+        async function runClassicalSearch() {
+            if(searching) return;
+            searching = true;
+            resetSearch();
+            searchStatus.innerText = "Classical: Checking boxes one by one...";
+            searchStatus.className = "text-slate-300 font-bold h-6 mb-6";
+
+            for(let i=0; i<numBoxes; i++) {
+                const box = document.getElementById(`box-${i}`);
+                box.style.backgroundColor = "#475569"; 
+                await new Promise(r => setTimeout(r, 150)); 
+                if(i === targetIndex) {
+                    box.style.backgroundColor = "#ef4444"; 
+                    box.classList.remove('text-transparent');
+                    box.classList.add('text-white');
+                    searchStatus.innerText = `Classical found it in ${i + 1} steps!`;
+                    searchStatus.className = "text-brand-red font-bold h-6 mb-6";
+                    searching = false;
+                    return;
+                }
+            }
+        }
+
+        async function runQuantumSearch() {
+            if(searching) return;
+            searching = true;
+            resetSearch();
+            searchStatus.innerText = "Quantum: Applying wave interference to all boxes...";
+            searchStatus.className = "text-brand-babyblue font-bold h-6 mb-6 glow-text";
+            const allBoxes = document.querySelectorAll('.search-box');
+            allBoxes.forEach(box => { box.style.backgroundColor = "rgba(125, 211, 252, 0.4)"; });
+            await new Promise(r => setTimeout(r, 800)); 
+            allBoxes.forEach(box => { box.style.backgroundColor = "#334155"; });
+            const targetBox = document.getElementById(`box-${targetIndex}`);
+            targetBox.style.backgroundColor = "#7dd3fc"; 
+            targetBox.classList.remove('text-transparent');
+            targetBox.classList.add('text-brand-dark');
+            searchStatus.innerText = `Quantum found it instantly in 1 step!`;
+            searchStatus.className = "text-brand-babyblue font-bold h-6 mb-6";
+            searching = false;
+        }
+
+        // ================= Game 3: Entanglement =================
+        let isEntangled = false;
+        
+        function entangleParticles() {
+            isEntangled = true;
+            document.getElementById('entangle-line').classList.replace('border-slate-500', 'border-brand-red');
+            document.getElementById('entangle-line').classList.replace('border-dashed', 'border-solid');
+            document.getElementById('entangle-line').style.boxShadow = "0 0 10px #ef4444";
+            document.getElementById('entangle-status').innerText = "Entangled! Flipping one flips the other instantly.";
+            document.getElementById('entangle-status').className = "text-brand-red font-bold h-6 mb-6 text-sm glow-text";
+        }
+
+        function flipAlice() {
+            let alice = document.getElementById('alice-particle');
+            let bob = document.getElementById('bob-particle');
+            let newState = alice.innerText === "0" ? "1" : "0";
+            
+            // Flip Alice
+            alice.innerText = newState;
+            alice.style.backgroundColor = newState === "1" ? "#ef4444" : "#475569"; // Red or slate
+            
+            // If entangled, Bob instantly flips
+            if (isEntangled) {
+                bob.innerText = newState;
+                bob.style.backgroundColor = newState === "1" ? "#ef4444" : "#475569";
+            }
+        }
+
+        // ================= Game 4: Exponential Scaling =================
+        function updateQubits(value) {
+            document.getElementById('qubit-count').innerText = value;
+            let states = Math.pow(2, parseInt(value));
+            document.getElementById('qubit-states').innerText = states.toLocaleString();
+        }
+
+        // ================= Game 5: Decryption Race =================
+        let hacking = false;
+        function startHack() {
+            if (hacking) return;
+            hacking = true;
+            
+            let classicalBar = document.getElementById('classical-bar');
+            let quantumBar = document.getElementById('quantum-bar');
+            let status = document.getElementById('hack-status');
+            let icon = document.getElementById('vault-icon');
+            
+            // Reset
+            classicalBar.style.width = '0%';
+            quantumBar.style.width = '0%';
+            icon.className = "fa-solid fa-lock text-slate-500 text-4xl mb-2 transition-all duration-500";
+            status.innerText = "Hack initiated. Systems racing...";
+            status.className = "text-white font-bold h-6 mb-6 text-sm";
+            
+            // Classical Crawl (takes forever)
+            let classicalWidth = 0;
+            let classicalInterval = setInterval(() => {
+                if (classicalWidth < 95) classicalWidth += 0.5;
+                classicalBar.style.width = classicalWidth + '%';
+            }, 100);
+
+            // Quantum Instant Break
+            setTimeout(() => {
+                clearInterval(classicalInterval);
+                quantumBar.style.width = '100%';
+                icon.className = "fa-solid fa-lock-open text-brand-babyblue text-4xl shadow-none glow-text";
+                status.innerText = "Quantum Cracked the code instantly via Shor's Algorithm!";
+                status.className = "text-brand-babyblue font-bold h-6 mb-6 text-sm glow-text";
+                setTimeout(() => { hacking = false; }, 1000);
+            }, 1500); // 1.5 seconds later
+        }
+    </script>
 </body>
 </html>
